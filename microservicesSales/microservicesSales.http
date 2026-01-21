@@ -1,6 +1,66 @@
-@microservicesSales_HostAddress = http://localhost:5261
+@microservicesSales_HostAddress = http://localhost:8080
+@productId = f271ad2e-2d80-4bbf-a56e-a4e23143b8fb
 
-GET {{microservicesSales_HostAddress}}/weatherforecast/
+
+###new product
+POST {{microservicesSales_HostAddress}}/api/Product/CreateProduct
+Content-Type: application/json
+
+{
+  "name": "Laptop Dell",
+  "price": 1200.50,
+  "initialStock": 10
+}
+
+### Get all products
+GET {{microservicesSales_HostAddress}}/api/Product/GetAllProducts
 Accept: application/json
 
-###
+### Get product by id
+GET {{microservicesSales_HostAddress}}/api/Product/GetProductById/{{productId}}
+Accept: application/json
+
+### Update product
+PATCH {{microservicesSales_HostAddress}}/api/Product/UpdateProduct/{{productId}}
+Content-Type: application/json
+
+{
+  "name": "Laptop Dell XPS",
+  "price": 1299.99
+}
+
+### Delete product
+DELETE {{microservicesSales_HostAddress}}/api/Product/DeleteProduct/{{productId}}
+
+### Adjust stock (increase)
+PATCH {{microservicesSales_HostAddress}}/api/Product/AdjustStock/{{productId}}
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+### Reduce stock
+PATCH {{microservicesSales_HostAddress}}/api/Product/ReduceStock/{{productId}}
+Content-Type: application/json
+
+{
+  "quantity": 2
+}
+
+
+### Create sale - success example
+POST {{baseUrl}}/api/Sales/CreateSale
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": "11111111-1111-1111-1111-111111111111", "quantity": 2 },
+    { "productId": "22222222-2222-2222-2222-222222222222", "quantity": 1 }
+  ]
+}
+
+### Get sale by id (route style)
+GET {{baseUrl}}/api/Sales/GetSale/{{saleId}}
+Accept: application/json
+

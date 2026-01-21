@@ -1,0 +1,42 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Xml@20001!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  migrate:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+    - sqlserver
+    volumes:
+    - ./db:/db
+    command: >
+       bash -c "
+        echo 'Waiting for SQL Server...';
+        for i in {1..30}; do
+          /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P 'Xml@20001!' -Q 'SELECT 1' 2>/dev/null && break;
+          sleep 5;
+        done;
+        echo 'Ensuring database exists...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P 'Xml@20001!' -d master -Q \"IF DB_ID('SalesDb') IS NULL CREATE DATABASE SalesDb\";
+        echo 'Running migrations on SalesDb...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P 'Xml@20001!' -d SalesDb -i /db/migrate.sql "
+        
+    
+  api:
+    build: .
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__SalesDb=Server=sqlserver,1433;Database=SalesDb;User Id=sa;Password=Xml@20001!;TrustServerCertificate=True
+    ports:
+      - "8080:8080"
+    depends_on:
+      - migrate
+
+volumes:
+  sql_data:
