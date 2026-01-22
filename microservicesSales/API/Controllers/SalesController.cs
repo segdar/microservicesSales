@@ -22,7 +22,7 @@ namespace microservicesSales.API.Controllers
             return Created($"/sales/{saleId}", new { id = saleId });
         }
 
-        [HttpGet("GetSale")]
+        [HttpGet("GetSale/{id}")]
         public async Task<IActionResult> GetSaleById([FromRoute] Guid id, CancellationToken ct) {
             var sale = await _salesUseCase.GetSaleByIdAsync(id, ct);
             if(sale is null)
