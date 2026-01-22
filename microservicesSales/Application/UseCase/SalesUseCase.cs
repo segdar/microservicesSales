@@ -1,5 +1,6 @@
 ﻿using microservicesSales.Application.DTOs;
 using microservicesSales.Application.Interfaces;
+using microservicesSales.Domain;
 
 namespace microservicesSales.Application.UseCase
 {
@@ -22,7 +23,7 @@ namespace microservicesSales.Application.UseCase
         {
             if(req.Items == null || !req.Items.Any())
             {
-                throw new ArgumentException("La venta debe tener detalle");
+                throw new DomainException("La venta debe tener detalle");
             }
 
             Guid saleId = Guid.Empty;
@@ -35,7 +36,7 @@ namespace microservicesSales.Application.UseCase
                 
                 if(products.Count != productID.Count)
                 {
-                    throw new ArgumentException("Uno o mas productos no existen.");
+                    throw new DomainException("Uno o mas productos no existen.");
                 }
 
                 var LstIdsProducts = products.ToDictionary(product => product.Id, p => p);

@@ -1,5 +1,6 @@
 ﻿using microservicesSales.Application.DTOs;
 using microservicesSales.Application.Interfaces;
+using microservicesSales.Domain;
 
 namespace microservicesSales.Application.UseCase
 {
@@ -54,7 +55,7 @@ namespace microservicesSales.Application.UseCase
         public async Task<Guid> UpdateProductAsync(Guid id, UpdateProductRequest req, CancellationToken ct)
         {
             var product = await _products.GetByIdAsync(id, ct);
-            if (product is null) throw new ArgumentException("El producto no existe.");
+            if (product is null) throw new DomainException("El producto no existe.");
 
             product.updateProducto(req.Name);
             if(product.Price != req.Price)
@@ -71,7 +72,7 @@ namespace microservicesSales.Application.UseCase
         public async Task<Guid>  DeleteProductAsync (Guid id, CancellationToken ct)
         {
             var product = await _products.GetByIdAsync(id, ct);
-            if (product is null) throw new ArgumentException("El producto no existe.");
+            if (product is null) throw new DomainException("El producto no existe.");
             await _products.Delete(product);
             await _uow.SaveChangesAsync(ct);
             return product.Id;
@@ -80,7 +81,7 @@ namespace microservicesSales.Application.UseCase
         public async Task IncreaseStockAsync(Guid id, int quantity, CancellationToken ct)
         {
             var product = await _products.GetByIdAsync(id, ct);
-            if (product is null) throw new ArgumentException("El producto no existe.");
+            if (product is null) throw new DomainException("El producto no existe.");
             product.UpdateStock(quantity);
             await _uow.SaveChangesAsync(ct);
 
@@ -90,7 +91,7 @@ namespace microservicesSales.Application.UseCase
         public async Task ReduceStockAsync(Guid id, int quantity, CancellationToken ct)
         {
             var product = await _products.GetByIdAsync(id, ct);
-            if (product is null) throw new ArgumentException("El producto no existe.");
+            if (product is null) throw new DomainException("El producto no existe.");
             product.ReducerStock(quantity);
             await _uow.SaveChangesAsync(ct);
 
