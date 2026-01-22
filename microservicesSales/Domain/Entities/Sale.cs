@@ -1,9 +1,11 @@
-using System.Runtime.CompilerServices;
+
+
+using microservicesSales.Domain;
 
 public class Sale {
     public Guid Id { get; private set; } = Guid.NewGuid();
     public DateTime Date { get; private set; } = DateTime.UtcNow;
-    public List<SaleItem> Items { get; private set; }
+    public List<SaleItem> Items { get; private set; } = new();
     public decimal TotalAmount  => Items.Sum(item => item.Subtotal);
     private Sale() { }
     public static Sale Create(IEnumerable<(Product product, int quantity)> lines)
@@ -15,7 +17,7 @@ public class Sale {
             sale.addItem(product, qty);
         }
         
-        if(sale.Items.Count == 0) throw new ArgumentException("La venta debe tener al menos un item.");
+        if(sale.Items.Count == 0) throw new DomainException("La venta debe tener al menos un item.");
 
         return sale;
 
@@ -24,7 +26,7 @@ public class Sale {
 
     private void addItem(Product product, int quantity)
     {
-        if (quantity <=0 ) throw new ArgumentNullException("La cantidad no puede ser menor a 0");
+        if (quantity <=0 ) throw new DomainException("La cantidad no puede ser menor a 0");
         Items.Add(new SaleItem(product.Id,product.Name, quantity, product.Price));
     }
 
@@ -43,9 +45,9 @@ public class SaleItem {
     private SaleItem() { }
     public SaleItem(Guid productId, string productName, int quantity, decimal unitPrice)
     {
-        if (quantity <= 0) throw new ArgumentException("La cantidad debe ser mayor a 0", nameof(quantity));
-        if (unitPrice < 0) throw new ArgumentException("El precio unitario no puede ser negativo.", nameof(unitPrice));
-        if (string.IsNullOrEmpty(productName)) throw new ArgumentNullException("El nombre del producto ir vacio.", nameof(productName));
+        if (quantity <= 0) throw new DomainException("La cantidad debe ser mayor a 0");
+        if (unitPrice < 0) throw new DomainException("El precio unitario no puede ser negativo.");
+        if (string.IsNullOrEmpty(productName)) throw new DomainException("El nombre del producto ir vacio.");
 
 
         ProductId = productId;
