@@ -60,7 +60,7 @@ Content-Type: application/json
 }
 
 
-### Create sale - success example
+### Create sale
 POST {{microservicesSales_HostAddress}}/api/Sales/CreateSale
 Content-Type: application/json
 
@@ -70,6 +70,17 @@ Content-Type: application/json
     { "productId": "a2649c6f-a73e-4982-9764-8b9d5d8d48a5", "quantity": 1 }
   ]
 }
+
+### Create sale vacio
+POST {{microservicesSales_HostAddress}}/api/Sales/CreateSale
+Content-Type: application/json
+
+{
+  "items": [
+   
+  ]
+}
+
 
 ### Get sale by id (route style)
 GET {{microservicesSales_HostAddress}}/api/Sales/GetSale/0916c018-df31-4210-b69f-c5fd53db5034
