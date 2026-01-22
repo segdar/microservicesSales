@@ -1,5 +1,6 @@
 using microservicesSales.Application.Interfaces;
 using microservicesSales.Application.UseCase;
+using microservicesSales.Domain;
 using microservicesSales.Infrastructure.Hubs;
 using microservicesSales.Infrastructure.Repository;
 using microservicesSales.Infrastructure.UnitOfWork;
@@ -52,6 +53,37 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler(handlerApp =>
+{
+    handlerApp.Run(async context =>
+    {
+        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+
+        if (error is InsufficientStockException)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(new { error = error.Message });
+            return;
+        }
+        if (error is DomainException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { error = error.Message });
+            return;
+        }
+
+        if (error is DbUpdateConcurrencyException)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(new { error = "Conflicto de concurrencia. Reintenta la operación." });
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "Error inesperado." });
+    });
+});
 
 app.UseHttpsRedirection();
 
